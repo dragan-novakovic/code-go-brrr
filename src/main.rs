@@ -1,42 +1,44 @@
+use std::collections::HashMap;
+
 fn main() {
     struct LRUCache {
         capacity: i32,
-        keys: Vec<i32>,
-        prev_keys: Vec<i32>,
-        values: Vec<i32>,
+        head: Option<Node>,
+        tail: Option<Node>,
+        store: HashMap<i32, Node>,
     }
 
-    /**
-     * `&self` means the method takes an immutable reference.
-     * If you need a mutable reference, change it to `&mut self` instead.
-     */
+    struct Node {
+        value: i32,
+        prev: Box<Option<Node>>,
+        next: Box<Option<Node>>,
+    }
+
+    impl Node {
+        fn new(value: i32) -> Self {
+            Node {
+                value,
+                prev: Box::new(None),
+                next: Box::new(None),
+            }
+        }
+    }
+
     impl LRUCache {
         fn new(capacity: i32) -> Self {
             LRUCache {
                 capacity,
-                keys: vec![],
-                prev_keys: vec![],
-                values: vec![],
+                head: None,
+                tail: None,
+                store: HashMap::new(),
             }
         }
 
         fn get(&mut self, key: i32) -> i32 {
-            match self.keys.iter().position(|k| k == &key) {
-                Some(x) => {
-                    self.prev_keys.push(key);
-                    println!("STO ME ZAJ, {:?}", self.prev_keys);
-                    self.values[x]
-                }
-                None => -1,
-            }
+            2
         }
 
-        fn put(&mut self, key: i32, value: i32) {
-            if (self.keys.len() as i32) < self.capacity {
-                self.keys.push(key);
-                self.values.push(value);
-            }
-        }
+        fn put(&mut self, key: i32, value: i32) {}
     }
 
     let mut lRUCache = LRUCache::new(2);
