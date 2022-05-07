@@ -3,78 +3,86 @@ use std::collections::HashMap;
 fn main() {
     #[derive(Debug)]
     struct LRUCache {
-        capacity: i32,
-        head: Box<Option<Node>>,
-        tail: Box<Option<Node>>,
+        capacity: usize,
+        head: Option<usize>,
+        tail: Option<usize>,
         store: HashMap<i32, Node>,
+        node_list: Vec<Node>,
     }
 
     #[derive(Clone, Debug)]
     struct Node {
         value: i32,
-        prev: Box<Option<Node>>,
-        next: Box<Option<Node>>,
+        index: usize,
+        prev: Option<usize>,
+        next: Option<usize>,
     }
 
     impl Node {
         fn new(value: i32) -> Self {
             Node {
                 value,
-                prev: Box::new(None),
-                next: Box::new(None),
+                index: 0,
+                prev: None,
+                next: None,
             }
         }
     }
 
     impl LRUCache {
-        fn new(capacity: i32) -> Self {
+        fn new(capacity: usize) -> Self {
             LRUCache {
                 capacity,
-                head: Box::new(None),
-                tail: Box::new(None),
+                head: None,
+                tail: None,
                 store: HashMap::new(),
+                node_list: vec![],
             }
         }
 
         fn get(&mut self, key: i32) -> i32 {
-            2
+            let mut node = &mut self.store.get_mut(&key).unwrap();
+
+            node.next = None;
+            node.prev = self.head;
+
+            node.value
         }
 
         fn put(&mut self, key: i32, value: i32) {
-            if (self.store.len() as i32) < self.capacity {
-                if (*self.head.clone()).is_none() {
-                    let mut head = Node::new(value);
-                    let tail = Node::new(value);
+            let len = self.node_list.len();
+            if len == 0 {
+                let mut node = Node::new(value);
+                node.prev = Some(0);
+                node.next = Some(0);
+                node.index = 0;
 
-                    head.next = Box::new(Some(tail));
-                    (*head.next).unwrap().prev = Box::new(Some(head));
+                self.node_list.push(node.clone());
+                self.head = Some(0);
+                self.tail = Some(0);
+                self.store.insert(key, node);
+            }
 
-                    self.head = Box::new(Some(head));
-                    self.tail = head.next;
-                }
+            if len < self.capacity && len > 0 {
+                let mut node = Node::new(value);
+                node.prev = self.head;
+                node.index = len;
 
-                let mut new_head = Node::new(value);
-                let mut old_head = (*self.head.clone()).unwrap();
-
-                new_head.next = self.head.clone();
-                (*new_head.next).unwrap().prev = Box::new(Some(new_head));
-
-                self.head = Box::new(Some(new_head.clone()));
-
-                self.store.insert(key, new_head);
-            } else {
+                self.node_list.push(node.clone());
+                self.head = Some(len);
+                self.node_list[len - 1].next = Some(len);
             }
         }
     }
 
     let mut lRUCache = LRUCache::new(2);
-    lRUCache.put(1, 1); // cache is {1=1}
-                        // lRUCache.put(2, 2); // cache is {1=1, 2=2}
-                        // lRUCache.get(1); // return 1
-                        // lRUCache.put(3, 3); // LRU key was 2, evicts key 2, cache is {1=1, 3=3}
-                        // lRUCache.get(2); // returns -1 (not found)
-                        // lRUCache.put(4, 4); // LRU key was 1, evicts key 1, cache is {4=4, 3=3}
-                        // lRUCache.get(1); // return -1 (not found)
-                        // lRUCache.get(3); // return 3
-                        // lRUCache.get(4); // return 4
+    lRUCache.put(1, 10); // cache is {1=1}
+    lRUCache.put(2, 20); // cache is {1=1, 2=2}
+    lRUCache.get(1); // return 1
+                     // lRUCache.put(3, 3); // LRU key was 2, evicts key 2, cache is {1=1, 3=3}
+                     // lRUCache.get(2); // returns -1 (not found)
+                     // lRUCache.put(4, 4); // LRU key was 1, evicts key 1, cache is {4=4, 3=3}
+                     // lRUCache.get(1); // return -1 (not found)
+                     // lRUCache.get(3); // return 3
+                     // lRUCache.get(4); // return 4
 }
