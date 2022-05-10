@@ -13,6 +13,7 @@ fn main() {
 
     #[derive(Clone, Debug)]
     struct Node {
+        key: i32,
         value: i32,
         index: usize,
         prev: Option<usize>,
@@ -20,8 +21,9 @@ fn main() {
     }
 
     impl Node {
-        fn new(value: i32) -> Self {
+        fn new(key: i32, value: i32) -> Self {
             Node {
+                key,
                 value,
                 index: 0,
                 prev: None,
@@ -59,7 +61,6 @@ fn main() {
             if node.index == self.tail.unwrap() {
                 //node next postaje tail
                 self.tail = Some(self.node_list[node.next.unwrap()].index);
-                dbg!(self.tail);
             }
 
             // setup new head
@@ -86,15 +87,14 @@ fn main() {
             }
 
             self.head = Some(node.index);
-            dbg!(self.tail);
 
             node.value
         }
 
         fn put(&mut self, key: i32, value: i32) {
             let len = self.node_list.len();
-            if self.length == 0 {
-                let mut node = Node::new(value);
+            if self.length == 0 && len == 0 {
+                let mut node = Node::new(key, value);
                 node.prev = Some(0);
                 node.next = Some(0);
                 node.index = 0;
@@ -109,7 +109,7 @@ fn main() {
             }
 
             if self.length < self.capacity && self.length > 0 && len > 0 {
-                let mut node = Node::new(value);
+                let mut node = Node::new(key, value);
                 node.prev = self.head;
                 node.index = len;
 
@@ -124,7 +124,7 @@ fn main() {
             }
 
             if self.length >= self.capacity {
-                let mut node = Node::new(value);
+                let mut node = Node::new(key, value);
 
                 let old_tail = self.node_list[self.tail.unwrap()].clone();
                 let mut new_tail = self.node_list[old_tail.next.unwrap()].clone();
@@ -133,9 +133,9 @@ fn main() {
                 self.tail = Some(new_tail.index);
 
                 // update
-                self.node_list[self.tail.unwrap()] = Node::new(-1);
+                dbg!(self.tail.unwrap());
+                self.node_list[old_tail.index] = Node::new(old_tail.key, 999999);
                 self.node_list[new_tail.index] = new_tail.clone();
-
                 // do stuff
                 node.prev = self.head;
                 node.index = len;
@@ -151,14 +151,15 @@ fn main() {
     }
 
     let mut lRUCache = LRUCache::new(2);
-    lRUCache.put(1, 10); // cache is {1=1}
-    lRUCache.put(2, 20); // cache is {1=1, 2=2}
+    lRUCache.put(1, 1); // cache is {1=1}
+    lRUCache.put(2, 2); // cache is {1=1, 2=2}
     lRUCache.get(1); // return 1
-    lRUCache.put(3, 3); // LRU key was 2, evicts key 2, cache is {1=1, 3=3}
-    dbg!(lRUCache);
-    // lRUCache.get(2); // returns -1 (not found)
-    // lRUCache.put(4, 4); // LRU key was 1, evicts key 1, cache is {4=4, 3=3}
-    // lRUCache.get(1); // return -1 (not found)
-    // lRUCache.get(3); // return 3
-    // lRUCache.get(4); // return 4
+    lRUCache.put(3, 3);
+    dbg!(lRUCache); // LRU key was 2, evicts key 2, cache is {1=1, 3=3}
+                    // dbg!(lRUCache);
+                    // lRUCache.get(2); // returns -1 (not found)
+                    // lRUCache.put(4, 4); // LRU key was 1, evicts key 1, cache is {4=4, 3=3}
+                    // lRUCache.get(1); // return -1 (not found)
+                    // lRUCache.get(3); // return 3
+                    // lRUCache.get(4); // return 4
 }
