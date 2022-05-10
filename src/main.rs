@@ -18,6 +18,7 @@ fn main() {
         index: usize,
         prev: Option<usize>,
         next: Option<usize>,
+        evicted: bool,
     }
 
     impl Node {
@@ -28,7 +29,13 @@ fn main() {
                 index: 0,
                 prev: None,
                 next: None,
+                evicted: false,
             }
+        }
+
+        fn evict(mut self) -> Node {
+            self.evicted = true;
+            self
         }
     }
 
@@ -145,6 +152,8 @@ fn main() {
                 self.node_list[len - 1].next = Some(len);
 
                 self.store.insert(key, node);
+                self.store
+                    .insert(old_tail.key, Node::new(old_tail.key, 999999).evict());
                 return;
             }
         }
