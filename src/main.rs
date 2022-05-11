@@ -115,8 +115,9 @@ fn main() {
                 return;
             }
 
-            if self.length < self.capacity && self.length > 0 && len > 0 {
-                let mut node = Node::new(key, value);
+            if (self.length < self.capacity) && self.length > 0 && len > 0 {
+                let mut node = Node::new(key.clone(), value);
+
                 node.prev = self.head;
                 node.index = len;
 
@@ -124,14 +125,20 @@ fn main() {
                 self.head = Some(len);
                 self.node_list[len - 1].next = Some(len);
 
-                self.store.insert(key, node);
-                self.length = self.length + 1;
-
+                match self.store.insert(key, node) {
+                    Some(_) => (),
+                    None => {
+                        self.length = self.length + 1;
+                        ()
+                    }
+                }
                 return;
             }
 
             if self.length >= self.capacity {
                 let mut node = Node::new(key, value);
+
+                //  println!("Heello 1. {:#?}", &self.store);
 
                 let old_tail = self.node_list[self.tail.unwrap()].clone();
                 let mut new_tail = self.node_list[old_tail.next.unwrap()].clone();
@@ -140,7 +147,7 @@ fn main() {
                 self.tail = Some(new_tail.index);
 
                 // update
-                self.node_list[old_tail.index] = Node::new(old_tail.key, 999999).evict();
+                self.node_list[old_tail.index] = Node::new(old_tail.key, old_tail.value).evict();
                 self.node_list[new_tail.index] = new_tail.clone();
                 // do stuff
                 node.prev = self.head;
@@ -150,10 +157,12 @@ fn main() {
                 self.head = Some(len);
                 self.node_list[len - 1].next = Some(len);
 
-                self.store.insert(key, node);
-
-                if &old_tail.key != &key {
-                    self.store.remove_entry(&old_tail.key);
+                match self.store.insert(key, node) {
+                    Some(_) => (),
+                    None => {
+                        self.store.remove_entry(&old_tail.key);
+                        ()
+                    }
                 }
             }
         }
@@ -161,16 +170,23 @@ fn main() {
 
     /*
 
-    ["LRUCache","put","put","put","put","get","get"]
-    [[2],[2,1],[1,1],[2,3],[4,1],[1],[2]]
-     */
+      ["LRUCache","get","put","get","put","put","get","get"]
+    [[2],[2],[2,6],[1],[1,5],[1,2],[1],[2]]
+         */
 
     let mut lRUCache = LRUCache::new(2);
-    lRUCache.put(2, 1); // cache is {1=1}
-    lRUCache.put(1, 1);
-    lRUCache.put(2, 3);
-    lRUCache.put(4, 1);
+    lRUCache.get(2);
+    //dbg!(&lRUCache.store);
+    lRUCache.put(2, 6);
+    //dbg!(&lRUCache.store);
     lRUCache.get(1);
+    //dbg!(&lRUCache.store);
+    lRUCache.put(1, 5);
+    //dbg!(&lRUCache.store);
+    lRUCache.put(1, 2);
+    //dbg!(&lRUCache.store);
+    lRUCache.get(1);
+    //dbg!(&lRUCache.store);
     let x = lRUCache.get(2);
     dbg!(x);
 }
