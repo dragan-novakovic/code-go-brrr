@@ -140,7 +140,6 @@ fn main() {
                 self.tail = Some(new_tail.index);
 
                 // update
-                dbg!(self.tail.unwrap());
                 self.node_list[old_tail.index] = Node::new(old_tail.key, 999999).evict();
                 self.node_list[new_tail.index] = new_tail.clone();
                 // do stuff
@@ -152,21 +151,26 @@ fn main() {
                 self.node_list[len - 1].next = Some(len);
 
                 self.store.insert(key, node);
-                self.store.remove_entry(&old_tail.key);
-                return;
+
+                if &old_tail.key != &key {
+                    self.store.remove_entry(&old_tail.key);
+                }
             }
         }
     }
 
+    /*
+
+    ["LRUCache","put","put","put","put","get","get"]
+    [[2],[2,1],[1,1],[2,3],[4,1],[1],[2]]
+     */
+
     let mut lRUCache = LRUCache::new(2);
-    lRUCache.put(1, 1); // cache is {1=1}
-    lRUCache.put(2, 2); // cache is {1=1, 2=2}
-    lRUCache.get(1); // return 1
-    lRUCache.put(3, 3); // LRU key was 2, evicts key 2, cache is {1=1, 3=3}
-                        // dbg!(lRUCache);
-                        // lRUCache.get(2); // returns -1 (not found)
-                        // lRUCache.put(4, 4); // LRU key was 1, evicts key 1, cache is {4=4, 3=3}
-                        // lRUCache.get(1); // return -1 (not found)
-                        // lRUCache.get(3); // return 3
-                        // lRUCache.get(4); // return 4
+    lRUCache.put(2, 1); // cache is {1=1}
+    lRUCache.put(1, 1);
+    lRUCache.put(2, 3);
+    lRUCache.put(4, 1);
+    lRUCache.get(1);
+    let x = lRUCache.get(2);
+    dbg!(x);
 }
