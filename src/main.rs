@@ -52,12 +52,17 @@ fn main() {
         }
 
         fn get(&mut self, key: i32) -> i32 {
+            let list_len = self.node_list.len();
             let point_node = match self.store.get(&key) {
-                Some(point) => point,
+                Some(point) => {
+                    if point.evicted {
+                        return -1;
+                    }
+                    point
+                }
                 None => return -1,
             };
             let mut node = self.node_list[point_node.index].clone();
-            let list_len = self.node_list.len();
 
             // if already head
             if node.index == self.head.unwrap() {
@@ -77,7 +82,7 @@ fn main() {
             let mut old_head = &mut self.node_list[self.head.unwrap()];
             old_head.next = Some(node.index);
 
-            // updating nodes left and right
+            // updating nodes left and right // sus
             if node.index >= 1 && node.index < list_len - 1 {
                 let nodes = &mut self.node_list;
                 let mut node_next = nodes[node.index + 1].clone();
@@ -170,23 +175,37 @@ fn main() {
 
     /*
 
-      ["LRUCache","get","put","get","put","put","get","get"]
-    [[2],[2],[2,6],[1],[1,5],[1,2],[1],[2]]
-         */
+        ["LRUCache","put","put","put","put","get","get","get","get","put","get","get","get","get","get"]
+    [[3],[1,1],[2,2],[3,3],[4,4],[4],[3],[2],[1],[5,5],[1],[2],[3],[4],[5]]
+             */
 
-    let mut lRUCache = LRUCache::new(2);
-    lRUCache.get(2);
+    let mut lRUCache = LRUCache::new(3);
+    lRUCache.put(1, 1);
     //dbg!(&lRUCache.store);
-    lRUCache.put(2, 6);
-    //dbg!(&lRUCache.store);
-    lRUCache.get(1);
-    //dbg!(&lRUCache.store);
-    lRUCache.put(1, 5);
-    //dbg!(&lRUCache.store);
-    lRUCache.put(1, 2);
-    //dbg!(&lRUCache.store);
-    lRUCache.get(1);
-    //dbg!(&lRUCache.store);
-    let x = lRUCache.get(2);
-    dbg!(x);
+    lRUCache.put(2, 2);
+    lRUCache.put(3, 3);
+    lRUCache.put(4, 4);
+    lRUCache.get(4); // 4 3 2
+    lRUCache.get(3); // 3 4 2  || 2 4 3
+                     // dbg!(&lRUCache.head);
+                     // dbg!(&lRUCache.tail);
+    dbg!(&lRUCache.node_list);
+    lRUCache.get(2); // 2 3 4
+    dbg!(&lRUCache.head);
+    dbg!(&lRUCache.tail);
+    dbg!(&lRUCache.node_list);
+    lRUCache.get(1); // - 1
+                     // dbg!(&lRUCache.tail);
+                     // dbg!(&lRUCache.node_list);
+                     // lRUCache.put(5, 5);
+                     // // dbg!(&lRUCache.store);
+                     // lRUCache.get(1);
+                     // // dbg!(&lRUCache.store);
+                     // lRUCache.get(2);
+                     // // dbg!(&lRUCache.store);
+                     // lRUCache.get(3); // -1
+                     //                  // dbg!(&lRUCache.store);
+                     // lRUCache.get(4); // 4
+                     //                  //  dbg!(&lRUCache.store);
+                     // lRUCache.get(5);
 }
