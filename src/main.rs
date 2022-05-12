@@ -40,9 +40,9 @@ fn main() {
     }
 
     impl LRUCache {
-        fn new(capacity: usize) -> Self {
+        fn new(capacity: i32) -> Self {
             LRUCache {
-                capacity,
+                capacity: capacity as usize,
                 head: None,
                 tail: None,
                 store: HashMap::new(),
@@ -63,9 +63,6 @@ fn main() {
             };
 
             let mut node = self.node_list[point_node.index].clone();
-            if key == 3 {
-                //   dbg!(node.clone());
-            }
 
             // if already head
             if node.index == self.head.unwrap() {
@@ -74,7 +71,6 @@ fn main() {
 
             // updating nodes left and right // sus
             if (node.index != self.head.unwrap()) && (node.index != self.tail.unwrap()) {
-                dbg!("ARE Y HERE");
                 let mut node_next = self.node_list[node.next.unwrap()].clone();
                 let mut node_prev = self.node_list[node.prev.unwrap()].clone();
                 // 4 3 2 | 3=node
@@ -90,12 +86,13 @@ fn main() {
             if node.index == self.tail.unwrap() {
                 //node next postaje tail
                 let mut node_next = self.node_list[node.next.unwrap()].clone();
-
+                //  dbg!(node_next.clone());
                 node_next.prev = None;
                 let next_index = node_next.index;
                 self.node_list[next_index] = node_next;
+                self.tail = Some(next_index);
 
-                self.tail = Some(node.index);
+                //  println!("{} ============ {}", &node.key, &self.tail.unwrap());
             }
 
             let mut old_head = self.node_list[self.head.unwrap()].clone();
@@ -153,10 +150,18 @@ fn main() {
             if self.length >= self.capacity {
                 let mut node = Node::new(key, value);
 
-                //  println!("Heello 1. {:#?}", &self.store);
+                //
+                let old_tail_index = self.tail.unwrap();
+                let old_tail = self.node_list[old_tail_index].clone();
 
-                let old_tail = self.node_list[self.tail.unwrap()].clone();
-                let mut new_tail = self.node_list[old_tail.next.unwrap()].clone();
+                let new_tail_index = match old_tail.clone().next {
+                    Some(x) => x,
+                    None => {
+                        dbg!(old_tail.clone());
+                        panic!("at the disco")
+                    }
+                };
+                let mut new_tail = self.node_list[new_tail_index].clone();
                 new_tail.prev = None;
 
                 self.tail = Some(new_tail.index);
@@ -168,9 +173,13 @@ fn main() {
                 node.prev = self.head;
                 node.index = len;
 
+                // let mut old_head = self.node_list[self.head.unwrap()].clone();
+                // old_head.next = Some(node.index);
                 self.node_list.push(node.clone());
-                self.head = Some(len);
-                self.node_list[len - 1].next = Some(len);
+
+                self.node_list[self.head.unwrap()].next = Some(node.index); //bug
+
+                self.head = Some(node.index);
 
                 match self.store.insert(key, node) {
                     Some(_) => (),
@@ -191,26 +200,24 @@ fn main() {
 
     let mut lru_cache = LRUCache::new(3);
     lru_cache.put(1, 1);
-    //dbg!(&lRUCache.store);
     lru_cache.put(2, 2);
     lru_cache.put(3, 3);
     lru_cache.put(4, 4);
     lru_cache.get(4);
     lru_cache.get(3); // 3 4 2
     lru_cache.get(2); // 2 3 4
-    dbg!(&lru_cache);
-    //lRUCache.get(1); // - 1
-    // dbg!(&lRUCache.tail);
-    // dbg!(&lRUCache.node_list);
-    // lRUCache.put(5, 5);
-    // // dbg!(&lRUCache.store);
-    // lRUCache.get(1);
-    // // dbg!(&lRUCache.store);
-    // lRUCache.get(2);
-    // // dbg!(&lRUCache.store);
-    // lRUCache.get(3); // -1
-    //                  // dbg!(&lRUCache.store);
-    // lRUCache.get(4); // 4
-    //                  //  dbg!(&lRUCache.store);
-    // lRUCache.get(5);
+                      // dbg!(&lru_cache);
+    lru_cache.get(1); // - 1
+                      //dbg!(&lru_cache);
+    lru_cache.put(5, 5); // 5 2 3 (4)
+                         // dbg!(&lru_cache);
+    lru_cache.get(1);
+    // dbg!(lru_cache);
+    lru_cache.get(2); // 2 5 3
+                      // dbg!(lru_cache);
+    lru_cache.get(3); // -1 // 3 2 5
+                      //dbg!(lru_cache);
+    let y = lru_cache.get(4); // 4
+                              //dbg!(y);
+                              // lru_cache.get(5);
 }
