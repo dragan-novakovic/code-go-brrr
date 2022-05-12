@@ -52,7 +52,6 @@ fn main() {
         }
 
         fn get(&mut self, key: i32) -> i32 {
-            let list_len = self.node_list.len();
             let point_node = match self.store.get(&key) {
                 Some(point) => {
                     if point.evicted {
@@ -62,43 +61,54 @@ fn main() {
                 }
                 None => return -1,
             };
+
             let mut node = self.node_list[point_node.index].clone();
+            if key == 3 {
+                //   dbg!(node.clone());
+            }
 
             // if already head
             if node.index == self.head.unwrap() {
                 return node.value;
             }
 
-            // if tail
+            // updating nodes left and right // sus
+            if (node.index != self.head.unwrap()) && (node.index != self.tail.unwrap()) {
+                dbg!("ARE Y HERE");
+                let mut node_next = self.node_list[node.next.unwrap()].clone();
+                let mut node_prev = self.node_list[node.prev.unwrap()].clone();
+                // 4 3 2 | 3=node
+                //  4 = node.next
+                //  2 = node.prev
+                node_prev.next = Some(node_next.index);
+                node_next.prev = Some(node_prev.index);
+
+                self.node_list[node.next.unwrap()] = node_next;
+                self.node_list[node.prev.unwrap()] = node_prev;
+            }
+
             if node.index == self.tail.unwrap() {
                 //node next postaje tail
-                self.tail = Some(self.node_list[node.next.unwrap()].index);
+                let mut node_next = self.node_list[node.next.unwrap()].clone();
+
+                node_next.prev = None;
+                let next_index = node_next.index;
+                self.node_list[next_index] = node_next;
+
+                self.tail = Some(node.index);
             }
+
+            let mut old_head = self.node_list[self.head.unwrap()].clone();
+
+            let old_head_index = old_head.index.clone();
+            old_head.next = Some(node.index);
+            self.node_list[old_head_index] = old_head;
 
             // setup new head
             node.next = None;
             node.prev = self.head;
-
-            let mut old_head = &mut self.node_list[self.head.unwrap()];
-            old_head.next = Some(node.index);
-
-            // updating nodes left and right // sus
-            if node.index >= 1 && node.index < list_len - 1 {
-                let nodes = &mut self.node_list;
-                let mut node_next = nodes[node.index + 1].clone();
-                let mut node_prev = nodes[node.index - 1].clone();
-                // 2 3 4
-                // 2 PREV -> 4
-                // 4 NEX -> 2
-
-                node_prev.prev = Some(node_next.index);
-                node_next.next = Some(node_prev.index);
-
-                nodes[node.index + 1] = node_next;
-                nodes[node.index - 1] = node_prev;
-            }
-
             self.head = Some(node.index);
+            self.node_list[node.index] = node.clone();
 
             node.value
         }
@@ -179,33 +189,28 @@ fn main() {
     [[3],[1,1],[2,2],[3,3],[4,4],[4],[3],[2],[1],[5,5],[1],[2],[3],[4],[5]]
              */
 
-    let mut lRUCache = LRUCache::new(3);
-    lRUCache.put(1, 1);
+    let mut lru_cache = LRUCache::new(3);
+    lru_cache.put(1, 1);
     //dbg!(&lRUCache.store);
-    lRUCache.put(2, 2);
-    lRUCache.put(3, 3);
-    lRUCache.put(4, 4);
-    lRUCache.get(4); // 4 3 2
-    lRUCache.get(3); // 3 4 2  || 2 4 3
-                     // dbg!(&lRUCache.head);
-                     // dbg!(&lRUCache.tail);
-    dbg!(&lRUCache.node_list);
-    lRUCache.get(2); // 2 3 4
-    dbg!(&lRUCache.head);
-    dbg!(&lRUCache.tail);
-    dbg!(&lRUCache.node_list);
-    lRUCache.get(1); // - 1
-                     // dbg!(&lRUCache.tail);
-                     // dbg!(&lRUCache.node_list);
-                     // lRUCache.put(5, 5);
-                     // // dbg!(&lRUCache.store);
-                     // lRUCache.get(1);
-                     // // dbg!(&lRUCache.store);
-                     // lRUCache.get(2);
-                     // // dbg!(&lRUCache.store);
-                     // lRUCache.get(3); // -1
-                     //                  // dbg!(&lRUCache.store);
-                     // lRUCache.get(4); // 4
-                     //                  //  dbg!(&lRUCache.store);
-                     // lRUCache.get(5);
+    lru_cache.put(2, 2);
+    lru_cache.put(3, 3);
+    lru_cache.put(4, 4);
+    lru_cache.get(4);
+    lru_cache.get(3); // 3 4 2
+    lru_cache.get(2); // 2 3 4
+    dbg!(&lru_cache);
+    //lRUCache.get(1); // - 1
+    // dbg!(&lRUCache.tail);
+    // dbg!(&lRUCache.node_list);
+    // lRUCache.put(5, 5);
+    // // dbg!(&lRUCache.store);
+    // lRUCache.get(1);
+    // // dbg!(&lRUCache.store);
+    // lRUCache.get(2);
+    // // dbg!(&lRUCache.store);
+    // lRUCache.get(3); // -1
+    //                  // dbg!(&lRUCache.store);
+    // lRUCache.get(4); // 4
+    //                  //  dbg!(&lRUCache.store);
+    // lRUCache.get(5);
 }
