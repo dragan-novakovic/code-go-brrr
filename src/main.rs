@@ -33,6 +33,17 @@ fn main() {
             }
         }
 
+        fn new_with_index(key: i32, value: i32, index: usize) -> Self {
+            Node {
+                key,
+                value,
+                index,
+                prev: None,
+                next: None,
+                evicted: false,
+            }
+        }
+
         fn evict(mut self) -> Node {
             self.evicted = true;
             self
@@ -148,8 +159,22 @@ fn main() {
             }
 
             if self.length >= self.capacity {
-                let mut node = Node::new(key, value);
+                let (is_old_key, mut node) = match self
+                    .store
+                    .insert(key, Node::new_with_index(key, value, len))
+                {
+                    Some(point_node) => (true, self.node_list[point_node.index].clone()),
+                    None => (false, Node::new(key, value)),
+                };
 
+                if is_old_key {
+                    //TODO
+                    // ako je stari key -> update prev next i copy
+                    // let mut node_next = self.node_list[node.next.unwrap()].clone();
+                    // let mut node_prev = self.node_list[node.prev.unwrap()].clone();
+                    self.node_list[node.index].value = value;
+                    return;
+                }
                 //
                 let old_tail_index = self.tail.unwrap();
                 let old_tail = self.node_list[old_tail_index].clone();
@@ -173,8 +198,6 @@ fn main() {
                 node.prev = self.head;
                 node.index = len;
 
-                // let mut old_head = self.node_list[self.head.unwrap()].clone();
-                // old_head.next = Some(node.index);
                 self.node_list.push(node.clone());
 
                 self.node_list[self.head.unwrap()].next = Some(node.index); //bug
@@ -192,32 +215,16 @@ fn main() {
         }
     }
 
-    /*
+    //  ["LRUCache","get","put","get","put","put","get","get"]
+    //[[2],[2],[2,6],[1],[1,5],[1,2],[1],[2]]
 
-        ["LRUCache","put","put","put","put","get","get","get","get","put","get","get","get","get","get"]
-    [[3],[1,1],[2,2],[3,3],[4,4],[4],[3],[2],[1],[5,5],[1],[2],[3],[4],[5]]
-             */
-
-    let mut lru_cache = LRUCache::new(3);
-    lru_cache.put(1, 1);
-    lru_cache.put(2, 2);
-    lru_cache.put(3, 3);
-    lru_cache.put(4, 4);
-    lru_cache.get(4);
-    lru_cache.get(3); // 3 4 2
-    lru_cache.get(2); // 2 3 4
-                      // dbg!(&lru_cache);
-    lru_cache.get(1); // - 1
-                      //dbg!(&lru_cache);
-    lru_cache.put(5, 5); // 5 2 3 (4)
-                         // dbg!(&lru_cache);
+    let mut lru_cache = LRUCache::new(2);
+    lru_cache.get(2);
+    lru_cache.put(2, 6);
     lru_cache.get(1);
-    // dbg!(lru_cache);
-    lru_cache.get(2); // 2 5 3
-                      // dbg!(lru_cache);
-    lru_cache.get(3); // -1 // 3 2 5
-                      //dbg!(lru_cache);
-    let y = lru_cache.get(4); // 4
-                              //dbg!(y);
-                              // lru_cache.get(5);
+    lru_cache.put(1, 5); // 1, 2
+    lru_cache.put(1, 2); //1(2), 1(5) | 1(2), 2
+    dbg!(lru_cache);
+    // lru_cache.get(1);
+    // lru_cache.get(2);
 }
