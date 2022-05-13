@@ -33,7 +33,7 @@ fn main() {
             }
         }
 
-        fn new_with_index(key: i32, value: i32, index: usize) -> Self {
+        fn _new_with_index(key: i32, value: i32, index: usize) -> Self {
             Node {
                 key,
                 value,
@@ -97,7 +97,7 @@ fn main() {
             if node.index == self.tail.unwrap() {
                 //node next postaje tail
                 let mut node_next = self.node_list[node.next.unwrap()].clone();
-                //  dbg!(node_next.clone());
+
                 node_next.prev = None;
                 let next_index = node_next.index;
                 self.node_list[next_index] = node_next;
@@ -139,8 +139,8 @@ fn main() {
             }
 
             if (self.length < self.capacity) && self.length > 0 && len > 0 {
-                let mut node = Node::new(key.clone(), value);
-
+                let mut node = Node::new(key, value);
+                //   dbg!(node.clone());
                 node.prev = self.head;
                 node.index = len;
 
@@ -159,10 +159,7 @@ fn main() {
             }
 
             if self.length >= self.capacity {
-                let (is_old_key, mut node) = match self
-                    .store
-                    .insert(key, Node::new_with_index(key, value, len))
-                {
+                let (is_old_key, mut node) = match self.store.insert(key, Node::new(key, value)) {
                     Some(point_node) => {
                         self.node_list[point_node.index].value = value;
                         (true, self.node_list[point_node.index].clone())
@@ -170,19 +167,30 @@ fn main() {
                     None => (false, Node::new(key, value)),
                 };
 
-                if is_old_key {}
+                if is_old_key {
+                    //move it to head and skip tail
+                    if node.index == self.head.unwrap() {
+                        self.store.insert(key, node);
+                        return;
+                    }
+
+                    let mut old_head = self.node_list[self.head.unwrap()].clone();
+                    old_head.next = Some(node.index);
+
+                    node.prev = Some(old_head.index);
+                    self.head = Some(node.index);
+
+                    self.node_list[node.index] = node.clone();
+                    self.node_list[old_head.index] = old_head.clone();
+
+                    self.store.insert(key, node);
+                    return;
+                }
                 //
                 let old_tail_index = self.tail.unwrap();
                 let old_tail = self.node_list[old_tail_index].clone();
 
-                let new_tail_index = match old_tail.clone().next {
-                    Some(x) => x,
-                    None => {
-                        dbg!(old_tail.clone());
-                        panic!("at the disco")
-                    }
-                };
-                let mut new_tail = self.node_list[new_tail_index].clone();
+                let mut new_tail = self.node_list[old_tail.next.unwrap()].clone();
                 new_tail.prev = None;
 
                 self.tail = Some(new_tail.index);
@@ -195,7 +203,6 @@ fn main() {
                 node.index = len;
 
                 self.node_list.push(node.clone());
-
                 self.node_list[self.head.unwrap()].next = Some(node.index); //bug
 
                 self.head = Some(node.index);
@@ -221,5 +228,5 @@ fn main() {
     lru_cache.put(1, 5); // 1, 2
     lru_cache.put(1, 2); //1(2), 1(5) | 1(2), 2
     lru_cache.get(1);
-    // lru_cache.get(2);
+    lru_cache.get(2);
 }
