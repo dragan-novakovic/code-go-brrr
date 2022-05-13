@@ -178,10 +178,20 @@ fn main() {
                     old_head.next = Some(node.index);
 
                     node.prev = Some(old_head.index);
+                    let temp_copy_node_next = node.next;
+                    node.next = None;
                     self.head = Some(node.index);
 
                     self.node_list[node.index] = node.clone();
                     self.node_list[old_head.index] = old_head.clone();
+
+                    if self.tail.unwrap() == node.index {
+                        if node.prev.is_some() {
+                            self.tail = node.prev;
+                        } else {
+                            self.tail = temp_copy_node_next
+                        }
+                    }
 
                     self.store.insert(key, node);
                     return;
@@ -219,9 +229,9 @@ fn main() {
     lru_cache.put(2, 1);
     lru_cache.put(1, 1);
     lru_cache.put(2, 3);
-    //lru_cache.put(4, 1);
+    lru_cache.put(4, 1);
     // lru_cache.get(1);
-    // lru_cache.get(2);
+    lru_cache.get(2);
     dbg!(&lru_cache);
     // lru_cache.get(2);
 }
