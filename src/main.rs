@@ -203,30 +203,25 @@ fn main() {
                 node.index = len;
 
                 self.node_list.push(node.clone());
-                self.node_list[self.head.unwrap()].next = Some(node.index); //bug
+                self.node_list[self.head.unwrap()].next = Some(node.index);
 
                 self.head = Some(node.index);
 
-                match self.store.insert(key, node) {
-                    Some(_) => (),
-                    None => {
-                        self.store.remove_entry(&old_tail.key);
-                        ()
-                    }
-                }
+                self.store.insert(key, node);
+                self.store.remove_entry(&old_tail.key);
             }
         }
     }
 
-    //  ["LRUCache","get","put","get","put","put","get","get"]
-    //[[2],[2],[2,6],[1],[1,5],[1,2],[1],[2]]
-
+    //  ["LRUCache","put","put","put","put","get","get"]
+    // [[2],[2,1],[1,1],[2,3],[4,1],[1],[2]]
     let mut lru_cache = LRUCache::new(2);
-    lru_cache.get(2);
-    lru_cache.put(2, 6);
-    lru_cache.get(1);
-    lru_cache.put(1, 5); // 1, 2
-    lru_cache.put(1, 2); //1(2), 1(5) | 1(2), 2
-    lru_cache.get(1);
-    lru_cache.get(2);
+    lru_cache.put(2, 1);
+    lru_cache.put(1, 1);
+    lru_cache.put(2, 3);
+    //lru_cache.put(4, 1);
+    // lru_cache.get(1);
+    // lru_cache.get(2);
+    dbg!(&lru_cache);
+    // lru_cache.get(2);
 }
