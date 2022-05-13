@@ -163,18 +163,14 @@ fn main() {
                     .store
                     .insert(key, Node::new_with_index(key, value, len))
                 {
-                    Some(point_node) => (true, self.node_list[point_node.index].clone()),
+                    Some(point_node) => {
+                        self.node_list[point_node.index].value = value;
+                        (true, self.node_list[point_node.index].clone())
+                    }
                     None => (false, Node::new(key, value)),
                 };
 
-                if is_old_key {
-                    //TODO
-                    // ako je stari key -> update prev next i copy
-                    // let mut node_next = self.node_list[node.next.unwrap()].clone();
-                    // let mut node_prev = self.node_list[node.prev.unwrap()].clone();
-                    self.node_list[node.index].value = value;
-                    return;
-                }
+                if is_old_key {}
                 //
                 let old_tail_index = self.tail.unwrap();
                 let old_tail = self.node_list[old_tail_index].clone();
@@ -224,7 +220,6 @@ fn main() {
     lru_cache.get(1);
     lru_cache.put(1, 5); // 1, 2
     lru_cache.put(1, 2); //1(2), 1(5) | 1(2), 2
-    dbg!(lru_cache);
-    // lru_cache.get(1);
+    lru_cache.get(1);
     // lru_cache.get(2);
 }
