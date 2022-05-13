@@ -223,15 +223,45 @@ fn main() {
         }
     }
 
-    //  ["LRUCache","put","put","put","put","get","get"]
-    // [[2],[2,1],[1,1],[2,3],[4,1],[1],[2]]
-    let mut lru_cache = LRUCache::new(2);
-    lru_cache.put(2, 1);
-    lru_cache.put(1, 1);
-    lru_cache.put(2, 3);
-    lru_cache.put(4, 1);
-    // lru_cache.get(1);
+    // ["LRUCache","put","put","put","put","put","get","put","get","get","put","get","put","put","put","get","put","get","get","get","get","put","put","get","get","get","put","put","get","put","get","put","get","get","get","put","put","put","get","put","get","get","put","put","get","put","put","put","put","get","put","put","get","put","put","get","put","put","put","put","put","get","put","put","get","put","get","get","get","put","get","get","put","put","put","put","get","put","put","put","put","get","get","get","put","put","put","get","put","put","put","get","put","put","put","get","get","get","put","put","put","put","get","put","put","put","put","put","put","put"]
+    //,,[12,24],[5,18],[13],[7,23],[8],[12],[3,27],[2,12],[5],[2,9],[13,4],[8,18],[1,7],[6],[9,29],[8,21],[5],[6,30],[1,12],[10],[4,15],[7,22],[11,26],[8,17],[9,29],[5],[3,4],[11,30],[12],[4,29],[3],[9],[6],[3,4],[1],[10],[3,29],[10,28],[1,20],[11,13],[3],[3,12],[3,8],[10,9],[3,26],[8],[7],[5],[13,17],[2,27],[11,15],[12],[9,19],[2,15],[3,16],[1],[12,17],[9,1],[6,19],[4],[5],[5],[8,1],[11,7],[5,2],[9,28],[1],[2,2],[7,4],[4,22],[7,24],[9,26],[13,28],[11,26]]
+    let mut lru_cache = LRUCache::new(10);
+    lru_cache.put(10, 13);
+    lru_cache.put(3, 17);
+    lru_cache.put(6, 11);
+    lru_cache.put(10, 5);
+    lru_cache.put(9, 10);
+    lru_cache.get(13);
+    lru_cache.put(2, 19);
     lru_cache.get(2);
-    dbg!(&lru_cache);
-    // lru_cache.get(2);
+    lru_cache.get(3);
+    lru_cache.put(5, 25);
+    lru_cache.get(8);
+    lru_cache.put(9, 22);
+    lru_cache.put(5, 5);
+    lru_cache.put(1, 30);
+    lru_cache.get(11);
+    lru_cache.put(9, 12);
+    lru_cache.get(7);
+    lru_cache.get(5);
+    lru_cache.get(8);
+    lru_cache.get(9);
+    lru_cache.put(4, 30);
+    lru_cache.put(9, 3);
+    lru_cache.get(9);
+    lru_cache.get(10);
+    lru_cache.put(6, 14);
+    lru_cache.put(3, 1);
+    lru_cache.get(3);
+    lru_cache.put(10, 11);
+    lru_cache.get(8);
+    lru_cache.put(2, 14);
+    lru_cache.get(1);
+    lru_cache.get(5);
+    lru_cache.get(4);
+    lru_cache.put(11, 4);
+    lru_cache.put(12, 24)
 }
+
+// ,null,null,-1,null,-1,24,null,null,18,null,null,null,null,-1,null,null,18,null,null,-1,null,null,null,null,null,-1,null,null,24,null,4,29,30,null,12,-1,null,null,null,null,29,null,null,null,null,17,22,-1,null,null,null,24,null,null,null,20,null,null,null,29,-1,-1,null,null,null,null,-1,null,null,null,null,null,null,null]
+// ,null,null,-1,null,-1,24,null,null,18,null,null,null,null,-1,null,null,18,null,null,-1,null,null,null,null,null,18,null,null,-1,null,4,29,30,null,12,-1,null,null,null,null,29,null,null,null,null,17,22,18,null,null,null,-1,null,null,null,20,null,null,null,-1,18,18,null,null,null,null,20,null,null,null,null,null,null,null]
