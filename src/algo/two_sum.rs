@@ -1,4 +1,4 @@
-pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
+pub fn _two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
     let mut first_num = 99;
     let mut second_num = 99;
 

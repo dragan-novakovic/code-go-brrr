@@ -1,2 +1,2 @@
-mod insertion_basic;
-mod two_sum;
+pub mod insertion_basic;
+pub mod two_sum;
