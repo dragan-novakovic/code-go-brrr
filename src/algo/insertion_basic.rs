@@ -1,14 +1,13 @@
-pub fn _sort(mut list: Vec<i32>) -> Vec<i32> {
-    for (mut i, _val) in list.clone().iter_mut().enumerate() {
-        if i > 0 {
-            let mut j = i - 1;
-            while (j >= 0) && (list[j] > list[i]) {
-                list[j + 1] = list[i];
-                j = j - 1;
-            }
+pub fn _sort(mut arr: Vec<i32>) -> Vec<i32> {
+    for i in 1..arr.len() {
+        let mut j = i;
+        while j > 0 && arr[j - 1] > arr[j] {
+            arr.swap(j - 1, j);
+            j -= 1;
         }
     }
 
-    dbg!(&list.clone());
-    list.clone()
+    arr
 }
+
+//2, 1, 5, 3, 2, 7, 1, 3
