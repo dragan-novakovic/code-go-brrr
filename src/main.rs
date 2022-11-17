@@ -9,5 +9,5 @@ fn main() {
     ];
 
     let result = algo::merge_interval::merge_intervals(list);
-    dbg!(result);
+    dbg!(result); //[[1,6],[8,10],[15,18]]
 }
