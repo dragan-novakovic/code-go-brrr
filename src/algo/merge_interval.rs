@@ -1,4 +1,25 @@
 pub fn merge_intervals(intervals: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+    let mut intervals_copy = intervals.clone();
+    intervals_copy.sort_by(|a, b| a[0].cmp(&b[0]));
+    let sorted_intervals = intervals
+        .iter()
+        .fold(vec![] as Vec<Vec<i32>>, |mut acc, inter| {
+            let interval_length = acc.len();
+
+            if interval_length == 0 {
+                acc.push(inter.clone());
+                return acc;
+            }
+
+            for interval in acc {
+                if interval[0] > inter[0] {
+                    //swap
+                }
+            }
+
+            return acc;
+        });
+
     let clean_intervals =
         intervals
             .iter()
