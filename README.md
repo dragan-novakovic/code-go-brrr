@@ -1,2 +1,2 @@
 # code-go-brrr
-Algos in Rust
+Rewriting Algo in Rust
